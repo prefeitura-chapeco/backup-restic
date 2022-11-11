@@ -2,14 +2,14 @@
 
 ### Features: 
 
-- Installation restic
-- Create remote repository
-- Create local directory for backups
-- Configuration scripts for restic 
-- Configuration retention snapshots 
-- Learn: 
-  - backup.sh
-  - backup-restic.inc
++ Installation restic
++ Create remote repository
++ Create local directory for backups
++ Configuration scripts for restic 
++ Configuration retention snapshots 
++ Learn: 
+  + backup.sh
+  + backup-restic.inc
 
 ## Installation Restic
 
@@ -19,25 +19,27 @@
 
 Install package from repository official distribuition after execute command in both servers (remote and local).
 
-``sudo apt install restic`` 
+> `sudo apt install restic` 
 
 ### 2. Create remote repository
 
-- Create Repository:
++ Create Repository:
 
 On the remote server store the backups run the command below.
 
-> restic -r ***DIRECTORY_STORE_BACKUPS*** init
-> restic -r /backup/your_directory/repository_directory init
+  + Sintaxe:
 
-PS.: create your directory before 
+> restic -r /backup/hostname_this_your_server/repository_directory init
 
-Code:
+  + Example:
 
-`` restic -r /backup/your_directory/
+> `restic -r /backup/app-web/database.restic init`  
+
+  + Note:
+
+> Create separate directories for databases and files. Remember that each director is a repository and can have its configuration
 
 
-PS.: My sugestion is create directory 
 
 
 
