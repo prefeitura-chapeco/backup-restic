@@ -1,5 +1,6 @@
 # How to create and maintenance backup service on restic
 
+This repositorio is intended to guide in a basic way to use restic to backup your environment.
 ### Features: 
 
 * Installation restic
@@ -7,11 +8,8 @@
 * Create local folder for backups
 * Configuration scripts for restic
 * Understanding files
-* Run task (cron)
-* Learn: 
-  * backup.sh
-  * backup-restic.inc
-
+* Run script
+* Logs
 ## Installation Restic
 
 ### 1. Installation restic
@@ -51,13 +49,21 @@ This script is configured for the following directory: databases, files, log.
 
 Run commands:
 
-> `` mkdir /backup`` 
-> `` mkdir /backup/databases``
-> ``mkdir /backup/files``
+> Create folder backup
+
+   `` mkdir /backup`` 
+
+> Create folder for store databases files temp
+
+  `` mkdir /backup/databases``
+
+> Create folder for store files temp
+
+  ``mkdir /backup/files``
 
 ### 4. Configuration scripts for restic
 
-* This script requires 4 files:
+* This script requires 4(four) files:
 1. backup.sh
 2. backup-restic.inc
 3. .pass
@@ -69,11 +75,47 @@ Download the latest version files `backup.sh`, `backup-restic.inc` and `.pass` f
 
 * Create simbolic link for restic 
 
-This script runs in the **/backup** folder so it is necessary to create a link to restic bin. Run bellow command inside the folder backup.
+This script runs in the **/backup** folder so it is necessary to create a link to restic bin. Run bellow command inside the folder **/backup**.
 
-> ``ln -s /usr/bin/restic restic
+> ``ln -s /usr/bin/restic restic``
 
 ### 5. Understanding files
+
+* File backup.sh
+
+This script file where you have all the instructions to back up, compress, and send the files to the remote repository. 
+This file should be edited for your backup task
+
+* File backup-restic.inc
+
+File containing all business logic and functions that are executed by the script. this file doesn't need to be edited by default.
+
+* File .pass
+
+This file contains the password of the remote repository. Your access should be restricted.
+
+* File restic link
+
+This files is a link to the restic binary. Is necessary but script check if exist.
+
+### 6. Run Script 
+
+* Run Manually
+
+To run manually runs the script from the folder ``**/backup**``. you need to give execution permission to the file ``backup.sh``.
+Run command:
+
+> ``./backup.sh`` 
+
+* Run Automatic
+
+Edit the crontab file and set the best time to run backup.
+
+### 7. Logs
+
+* Log files
+
+This script creates a log folder and log files are stored by one file for day of the week.
 
 
 
