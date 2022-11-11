@@ -16,7 +16,9 @@
 ### 1. Installation restic
 
 - Debian/ubuntu
-Install package from repository official distribuition. Execute this `sudo apt install restic` command in both servers (remote and local).
+Install package from repository official distribuition. Execute command in both servers (remote and local).
+
+> sudo apt install restic 
 
 
 
