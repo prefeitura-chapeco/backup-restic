@@ -73,7 +73,7 @@ function dump_postgres_gz
 }
 
 # 1=repository 2=files_or_directory 3=retention(optional)
-function enviar_restic
+function send_restic
 {
   RESTIC_BIN="`which restic`"
   [ -z "$RESTIC_BIN" ] && RESTIC_BIN="/backup/restic"

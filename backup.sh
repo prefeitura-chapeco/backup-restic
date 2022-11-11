@@ -4,77 +4,88 @@
 # update in 05/11/2022
 # version 1.0
 
-#VARIAVEIS
+#VARIABLES
 
-#Host remoto qual ira armazenar os backups
-HOST_REMOTO="10.0.1.4"
+# Host remote that will store the backups
+HOST_REMOTE="MY_IP_OR_HOSTNAME"
 
-#Pasta remota no servidor de destino que ira armazenar os backups
-#A pasta faz menção ao servidor para facilitar  
-DIR_REMOTO="/backup/suporte"
+# Remote folder store snapshots backups
+# The folder mentions the server to make it easier
+# example /backup/test
+DIR_REMOTE="/backup/test"
 
-#Diretorios temporario para a operação e envio do backup no servidor local
+# Directory or folders for the operation and sending of the backup to the local server
 DIR_FILES="/backup/files/"
-DIR_BANCO="/backup/banco/"
+DIR_BANCO="/backup/database/"
 
-#Variaveis para facilitar a manipulação dos arquivos
-ETC_FILES_GZ="teste_etc_files.tar.gz"
-FILES_GZ="_php.tar.gz"
-CONFIG_GZ="_config.tar.gz"
-DOCS_GZ="_files.tar.gz"
-ARQ_BANCO_SQL="dump_db_"
-ARQ_BANCO_GZ="dump_db_"
+# Variables to facilitate file manipulation. You create and define
+ETC_FILES_GZ="etc_files.tar.gz"
+ARQ_BANCO_SQL="dump_db_test.sql"
+PSQL_DUMP="dump_postgres.sql"
+ARQ_BANCO_GZ="dump_db_test.tar.gz"
 
-#Arquivo de instruição para o script onde tem todas as funções declaradas
+# Statement file for script where it has all functions declared
 . /backup/backup-restic.inc
 
-log_inicio
+log_begin
 
-#acessar diretorio files
+## ACCESS FOLDERS ##
+# call the function to access the $DIR_FILES
+## INSTRUCTIONS ##
+# access_dir path_to_folder_or_variable
 access_dir ${DIR_FILES}
 
-#compactar os arquivos
-## Função
-## compactar_arquivos -zcvf nome_arquivo_ou_variavel pasta_ou_arquivo_a_ser_compactado
-##exemplo
-compactar_arquivos -zcvf ${ETC_FILES_GZ} /etc
+## COMPRESS FILES ##
+# Compress files to send repository
+## INSTRUCTIONS ##
+# compress_files -zcvf file_name_or_variable_declared file_or_folder_for_compress
+compress_files -zcvf ${ETC_FILES_GZ} /etc
 
-#enviar o backup para o repositorio remoto
-## Função
-## enviar_restic repositorio_remoto arquivo_enviar
-enviar_restic files.restic "/backup/backup.sh"
+## SEND REPOSITORY BACKUP ##
+# Send the backup to the remote repository
+## INSTRUCTIONS ##
+# send_restic repository_remote files_or_variable
+send_restic files.restic "/backup/backup.sh"
+send_restic files.restic "/backup/backup-restic.inc"
+send_restic files.restic ${ETC_FILES_GZ}
 
-#remoção dos arquivos e backup
-access_dir ${DIR_FILES}
-remover_arquivos -vrf nome_arquivo_ou_variavel
-remover_arquivos -vrf glpi_homologacao${GLPI_FILES_GZ}
-remover_arquivos -vrf glpi_producao${GLPI_CONFIG_GZ}
-remover_arquivos -vrf glpi_homologacao${GLPI_CONFIG_GZ}
-remover_arquivos -vrf glpi_producao${GLPI_DOCS_GZ}
+## DELETING TEMP FILES ##
+# Deleting temp files after send to remote repository
+## INSTRUCTIONS ##
+# deleting_files options file_name_or_variable
+deleting_files -vrf ${ETC_FILES_GZ}
 
-#acessar diretorio de backup do banco
+## MANIPULATING DATABASES STEP ##
+
+## ACCESS FOLDERS ##
 access_dir ${DIR_BANCO}
 
-#efetuar o dump do banco de dados
-dump_mysql ${ARQ_BANCO_SQL}glpi_producao.sql backup sKEMjJmUQvfmVFeQ glpiweb
-dump_mysql ${ARQ_BANCO_SQL}glpi_homologacao.sql backup sKEMjJmUQvfmVFeQ glpi_cco_v10
+## DUMP FOR MYSQL DATABASES ##
+# Create dump file for all databases or specific database
+## INSTRUCTIONS ##
+# dump_mysql file_or_variable_to_dump username_access_db password_access_db db_name(optional databases or export all)
+# Export all databases
+dump_mysql ${ARQ_BANCO_SQL} user_test password_test
+# Export specific datadase
+dump_mysql ${ARQ_BANCO_SQL} user_test password_test my_database
 
-#acessar o diretorio do banco de dados
-access_dir ${DIR_BANCO}
+## DUMP FOR POSTGRESQL DATABASES COMPRESS RECOMMEMDED ##
+# Create dump file for specific database. 
+# This script use is command sudo -u postgres for access to databases for other user adjust script
+## INSTRUCTIONS ##
+# dump_postgres_gz file_or_variable_to_dump "db_name" port_access (optional if port defaul not declare)
+# Export database for default port
+dump_postgres_gz ${PSQL_DUMP} "db_name"
+#Exporta database for other port running on server
+dump_postgres_gz ${PSQL_DUMP} "db_name" 5433
 
-#compactação dos arquivos
-compactar_arquivos -zcvf ${ARQ_BANCO_GZ}glpi_producao.tar.gz ${ARQ_BANCO_SQL}glpi_producao.sql
-compactar_arquivos -zcvf ${ARQ_BANCO_GZ}glpi_homologacao.tar.gz ${ARQ_BANCO_SQL}glpi_homologacao.sql
+## COMPRESS FILES ##
+compress_files -zcvf ${PSQL_DUMP_GZ} ${PSQL_DUMP}
 
-#envia o backup do banco para o repositorio remoto
-enviar_restic banco.restic ${ARQ_BANCO_GZ}glpi_producao.tar.gz
-enviar_restic banco.restic ${ARQ_BANCO_GZ}glpi_homologacao.tar.gz
+## SEND REPOSITORY BACKUP ##
+send_restic banco.restic ${PSQL_DUMP_GZ}
 
-#Remoção dos arquivos apos envio ao repositorio remoto
-access_dir ${DIR_BANCO}
-remover_arquivos -vrf ${ARQ_BANCO_GZ}glpi_producao.sql
-remover_arquivos -vrf ${ARQ_BANCO_GZ}glpi_homologacao.sql
-remover_arquivos -vrf ${ARQ_BANCO_GZ}glpi_producao.tar.gz
-remover_arquivos -vrf ${ARQ_BANCO_GZ}glpi_homologacao.tar.gz
+## DELETING TEMP FILES ##
+deleting_files -vrf ${PSQL_DUMP_GZ}
 
-log_fim
+log_end
